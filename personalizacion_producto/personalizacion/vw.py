@@ -12,7 +12,7 @@ from xhtml2pdf import pisa
 
 import json
 
-from igs_app_base.views import GenericViews, GenericCreate, GenericRead
+from igs_app_base.views import GenericViews, GenericCreate, GenericRead, GenericList
 from producto.models import Producto
 from catalogo.models import EstadoPersonalizacion
 
@@ -57,6 +57,8 @@ class Create(GenericCreate):
                 PersonalizacionDetalle.objects.create(
                     personalizacion=self.object, campo=campo)
         return response
+
+
 
 
 class Read(GenericRead):
@@ -114,6 +116,27 @@ class ViewPersonalizacion(GenericRead):
     model = Personalizacion
     form_class = MainForm
 
+
+class List(GenericList):
+    model = Personalizacion
+    titulo = "Personalizaciones"
+    app = "producto"
+    form_class = MainForm
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        user = self.request.user
+        context['is_cliente'] = user.groups.filter(name='cliente').exists()
+        return context
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        user = self.request.user
+        if user.groups.filter(name='cliente').exists():
+            qs = qs.filter(user=user)
+        return qs
+
+views.List = List
 
 def ViewPDFPersonalizacion(request, pk):
     object = Personalizacion.objects.get(pk=pk)
