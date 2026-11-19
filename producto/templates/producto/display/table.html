@@ -1,30 +1,33 @@
 {% load display_product_helpers %}
 
 <!-- producto/producto/display/table.html start -->
-{% display_product_categories_tree %}
 
-<div class="my-3"></div>
+<p class="lead">Selecciona tu producto ideal y personalizalo:</p>
 
-<div class="accordion" id="accordionCategorias">
+<div class="row">
     {% for categoria in categories %}
-        <div class="accordion-item">
-            <h2 class="accordion-header" id="heading-cat-{{ categoria.pk }}">
-                <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapse-cat-{{ categoria.pk }}" aria-expanded="{% if forloop.first %}true{% else %}false{% endif %}" aria-controls="collapse-cat-{{ categoria.pk }}">
-                    {{ categoria }}
-                </button>
-            </h2>
-            <div id="collapse-cat-{{ categoria.pk }}" class="accordion-collapse collapse {% if forloop.first %}show{% endif %}" aria-labelledby="heading-cat-{{ categoria.pk }}" data-bs-parent="#accordionCategorias">
-                <div class="accordion-body">
-                    <div id="productos-table-{{ categoria.pk }}" class="row row-cols-1 row-cols-sm-3 g-4">
-                        {% for producto in categoria.productos.all %}
-                            {% if producto.mostrar_en_galeria %}
-                                {% include "producto/display/producto.html" %}
-                            {% endif %}
-                        {% endfor %}
-                    </div>
+        <div class="col-4 p-3">
+            <div class="border rounded-3 text-center p-3 category-item" data-category-id="{{ categoria.pk }}" data-is-active="false" onclick="toogle_category_display_items({{ categoria.pk }});">
+                <div class="float-end">
+                    <div class="text-secondary d-inline-block start inactive"><i class="fa-regular fa-star"></i></div>
+                    <div class="text-secondary d-none start active"><i class="fa-solid fa-star"></i></div>
                 </div>
+                <img src="{{ categoria.portada_url }}" alt="{{ categoria }}" class="img-fluid" />
+                <p class="lead">{{ categoria }}</p>
             </div>
         </div>
+    {% endfor %}
+</div>
+
+<h3>Productos</h3>
+
+<div class="row" id="items">
+    {% for categoria in categories %}
+        {% for producto in categoria.productos.all %}
+            {% if producto.mostrar_en_galeria %}
+                {% include "producto/display/producto.html" %}
+            {% endif %}
+        {% endfor %}
     {% endfor %}
 </div>
 

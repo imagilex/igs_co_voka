@@ -170,7 +170,7 @@ let check_show_productos = (pk) => {
 let personalizar_producto_open_panel = () => {
     let pk = pp_pk;
     let nombre = pp_nombre;
-    openPanel($(`#producto-personalizacion-${pk}-template`).html(), `Personalizar ${nombre}`);
+    openPanel($(`#producto-personalizacion-${pk}-template`).html(), `Personalizar Colores: ${nombre}`, true, null, 'modal-panel-message', true);
     const el = document.getElementById('modal-panel-message');
     el.addEventListener('shown.bs.modal', () => {
         const dialog = el.querySelector('.modal-dialog');
@@ -361,6 +361,39 @@ let actualiza_personalizacion = () => {
     let pk = parseInt($("#producto-personalizacion-form #producto_pk").val());
     colEvokaPers.update(pk, crea_registro(pk));
 }
+
+let toogle_category_display_items = (category_id) => {
+    let div_category = $(`div[data-category-id="${category_id}"]`);
+    let is_active = div_category.attr('data-is-active') === 'true';
+    if(is_active) {
+        div_category.attr('data-is-active', 'false');
+        div_category.find(`div.start.active`).addClass('d-none');
+        div_category.find(`div.start.active`).removeClass('d-inline-block');
+        div_category.find(`div.start.inactive`).addClass('d-inline-block');
+        div_category.find(`div.start.inactive`).removeClass('d-none');
+    } else {
+        div_category.attr('data-is-active', 'true');
+        div_category.find(`div.start.inactive`).addClass('d-none');
+        div_category.find(`div.start.inactive`).removeClass('d-inline-block');
+        div_category.find(`div.start.active`).addClass('d-inline-block');
+        div_category.find(`div.start.active`).removeClass('d-none');
+    }
+    display_category_items();
+}
+
+let display_category_items = () => {
+    let productos = $(`div.producto`);
+    productos.addClass('d-none');
+    $(`div[data-category-id][data-is-active="true"]`).each((idx, div_category) => {
+        let category_id = $(div_category).attr('data-category-id');
+        productos.each((idx, div_producto) => {
+            let categorias = $(div_producto).attr('data-categorias').split(',').map(c => c.trim());
+            if(categorias.includes(category_id)) {
+                $(div_producto).removeClass('d-none');
+            }
+        });
+    });
+};
 
 window.addEventListener('DOMContentLoaded', evt => {
     get_svg_ids();
