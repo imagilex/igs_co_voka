@@ -170,7 +170,7 @@ let check_show_productos = (pk) => {
 let personalizar_producto_open_panel = () => {
     let pk = pp_pk;
     let nombre = pp_nombre;
-    openPanel($(`#producto-personalizacion-${pk}-template`).html(), `Personalizar Colores: ${nombre}`, true, null, 'modal-panel-message', true);
+    openPanel($(`#producto-personalizacion-${pk}-template`).html(), `Personalizar Colores: ${nombre}`, true, null, 'modal-panel-message', false);
     const el = document.getElementById('modal-panel-message');
     el.addEventListener('shown.bs.modal', () => {
         const dialog = el.querySelector('.modal-dialog');
@@ -362,39 +362,93 @@ let actualiza_personalizacion = () => {
     colEvokaPers.update(pk, crea_registro(pk));
 }
 
-let toogle_category_display_items = (category_id) => {
+let display_fav_categories = () => {
+    $(`div[data-category-id]`).parent().addClass('d-none');
+    $(`div[data-category-id]`).parent().removeClass('d-block');
+    JSON.parse(localStorage.getItem('fav_categories') || '[]').forEach(category_id => {
+        $(`div[data-category-id="${category_id}"]`).parent().addClass('d-block');
+        $(`div[data-category-id="${category_id}"]`).parent().removeClass('d-none');
+    });
+    localStorage.setItem('show_fav_categories', 'true');
+    $(`#btn-display-fav-categorias`).addClass('d-none');
+    $(`#btn-display-fav-categorias`).removeClass('d-block');
+    $(`#btn-display-all-categorias`).addClass('d-block');
+    $(`#btn-display-all-categorias`).removeClass('d-none');
+};
+
+let display_all_categories = () => {
+    $(`div[data-category-id]`).parent().addClass('d-block');
+    $(`div[data-category-id]`).parent().removeClass('d-none');
+    localStorage.setItem('show_fav_categories', 'false');
+    $(`#btn-display-all-categorias`).addClass('d-none');
+    $(`#btn-display-all-categorias`).removeClass('d-block');
+    $(`#btn-display-fav-categorias`).addClass('d-block');
+    $(`#btn-display-fav-categorias`).removeClass('d-none');
+};
+
+let set_fav_category = (event, category_id) => {
+    if(event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    let current_fav_categories = JSON.parse(localStorage.getItem('fav_categories') || '[]');
+    if(!current_fav_categories.includes(category_id)) {
+        current_fav_categories.push(category_id);
+        localStorage.setItem('fav_categories', JSON.stringify(current_fav_categories));
+    }
     let div_category = $(`div[data-category-id="${category_id}"]`);
-    let is_active = div_category.attr('data-is-active') === 'true';
-    if(is_active) {
-        div_category.attr('data-is-active', 'false');
-        div_category.find(`div.start.active`).addClass('d-none');
-        div_category.find(`div.start.active`).removeClass('d-inline-block');
-        div_category.find(`div.start.inactive`).addClass('d-inline-block');
-        div_category.find(`div.start.inactive`).removeClass('d-none');
-    } else {
-        div_category.attr('data-is-active', 'true');
+    div_category.find(`div.start.inactive`).addClass('d-none');
+    div_category.find(`div.start.inactive`).removeClass('d-inline-block');
+    div_category.find(`div.start.active`).addClass('d-inline-block');
+    div_category.find(`div.start.active`).removeClass('d-none');
+}
+
+let unset_fav_category = (event, category_id) => {
+    if(event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    let current_fav_categories = JSON.parse(localStorage.getItem('fav_categories') || '[]');
+    if(current_fav_categories.includes(category_id)) {
+        current_fav_categories = current_fav_categories.filter(id => id !== category_id);
+        localStorage.setItem('fav_categories', JSON.stringify(current_fav_categories));
+    }
+    let div_category = $(`div[data-category-id="${category_id}"]`);
+    div_category.find(`div.start.active`).addClass('d-none');
+    div_category.find(`div.start.active`).removeClass('d-inline-block');
+    div_category.find(`div.start.inactive`).addClass('d-inline-block');
+    div_category.find(`div.start.inactive`).removeClass('d-none');
+}
+
+let display_category_items = (event, category_id) => {
+    if (event) {
+        event.stopPropagation();
+        event.preventDefault();
+    }
+    let productos = $(`div.producto`);
+    productos.addClass('d-none');
+    productos = $(`div.producto[data-categoria="${category_id}"]`);
+    productos.removeClass('d-none');
+    $(`#container-categories`).addClass('d-none');
+    $(`#container-products`).removeClass('d-none');
+};
+
+let display_categories = () => {
+    $(`#container-categories`).removeClass('d-none');
+    $(`#container-products`).addClass('d-none');
+}
+
+window.addEventListener('DOMContentLoaded', evt => {
+    get_svg_ids();
+    if(localStorage.getItem('show_fav_categories') === 'true') {
+        display_fav_categories();
+    }
+    let current_fav_categories = JSON.parse(localStorage.getItem('fav_categories') || '[]');
+    for(let category_id of current_fav_categories) {
+        let div_category = $(`div[data-category-id="${category_id}"]`);
         div_category.find(`div.start.inactive`).addClass('d-none');
         div_category.find(`div.start.inactive`).removeClass('d-inline-block');
         div_category.find(`div.start.active`).addClass('d-inline-block');
         div_category.find(`div.start.active`).removeClass('d-none');
     }
-    display_category_items();
-}
-
-let display_category_items = () => {
-    let productos = $(`div.producto`);
-    productos.addClass('d-none');
-    $(`div[data-category-id][data-is-active="true"]`).each((idx, div_category) => {
-        let category_id = $(div_category).attr('data-category-id');
-        productos.each((idx, div_producto) => {
-            let categorias = $(div_producto).attr('data-categorias').split(',').map(c => c.trim());
-            if(categorias.includes(category_id)) {
-                $(div_producto).removeClass('d-none');
-            }
-        });
-    });
-};
-
-window.addEventListener('DOMContentLoaded', evt => {
-    get_svg_ids();
 });
