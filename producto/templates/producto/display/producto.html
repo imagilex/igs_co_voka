@@ -1,6 +1,6 @@
 {% load humanize %}
 <!-- producto/producto/display/producto.html start -->
-<div class="col producto" data-categorias="{{ producto.categorias_pk|join:", " }}">
+<div class="col-sm-4 mb-3 producto d-none" data-categoria="{{ categoria.pk }}">
     <div class="card h-100">
         <img src="{{ MEDIA_URL }}{{ producto.fotografia }}" class="card-img-top" />
         <div class="card-body">
