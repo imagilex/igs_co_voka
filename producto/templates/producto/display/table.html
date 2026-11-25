@@ -11,8 +11,6 @@
         <i class="fa-regular fa-star fa-2x"></i>
     </button>
 </div>
-<p class="lead">Selecciona tu producto ideal y personalizalo:</p>
-
 <div class="row">
     {% for categoria in categories %}
         <div class="col-4 p-3">
@@ -40,7 +38,6 @@
         <i class="fa-solid fa-xmark fa-2x"></i>
     </button>
 </div>
-<p class="lead">Selecciona tu producto ideal y personalizalo:</p>
 <div class="row" id="items">
     {% for categoria in categories %}
         {% for producto in categoria.productos.all %}
